@@ -1,4 +1,5 @@
 project:
+  theme: jekyll-theme-merlot
   title: "Stroke Prediction Model"
   type: website
 
