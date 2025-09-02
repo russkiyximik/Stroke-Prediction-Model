@@ -1,6 +1,6 @@
 project:
-  theme: jekyll-theme-merlot
-  title: "Stroke Prediction Model"
+  remote_theme: pages-themes/merlot@v0.2.0
+  title: "Stroke Prediction Models"
   type: website
 
 
