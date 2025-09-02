@@ -1,0 +1,214 @@
+---
+title: "Stroke Prediction Model"
+format: html
+editor: visual
+---
+
+# Stroke Prediction Model
+
+## Introduction
+
+I will be building several models to predict heart disease. I will be using the Heart Failure Prediction Dataset from \[Kaggle\] (https://www.kaggle.com/datasets/fedesoriano/heart-failure-prediction).
+
+This web page will be split into several chunks. The first will be for data description and preparation, and the next several will be for each model that I subsequently add.
+
+I will first use a random forest model, then will update with more models periodically.
+
+## Part One: Data Description, Processing, and Preparation
+
+Part one is common to all the models. It's quite brief and simply goes through the pre-processing and data cleaning.
+
+### STEP ONE: LOADING LIBRARIES AND DATA
+
+This step is pretty self-explanatory. We will make use of six different R libraries for our initial analysis and model. First, `tidymodels` is a collection of packages for modeling and machine learning using `tidyverse` principles. The `workflows` library lets us use workflow container objects that are useful for modeling and analysis projects. The `tune` library will let us iterate through and find the best parameters for our models. The `ranger` library gives us access to a fast and efficient random forest algorithm. Lastly, `ggplot2` lets us make convenient and nice-looking plots.
+
+```{r results='hide'}
+library(tidymodels)
+library(tidyverse)
+library(workflows)
+library(tune)
+library(ranger)
+library(ggplot2)
+
+orig_data <- RKaggle::get_dataset('fedesoriano/heart-failure-prediction')
+```
+
+### STEP TWO: PRELIMINARY EDA, DATA IMPUTATION
+
+Let's take a glance at our data.
+
+```{r}
+glimpse(orig_data)
+```
+
+So, our data has 12 columns. I'll note that our output column (`HeartDisease`) is in 0s and 1s, representing negative and positive for heart disease, respectively. This is what we want to predict.
+
+We have two different column types, double and character. Let's take a look at the character variables in the dataset.
+
+```{r}
+orig_data %>% select(where(is.character)) %>% apply(2, table)
+```
+
+Let's go through these variables. The labeling of each variable is available on the Kaggle Data Card.
+
+`Sex` is skewed towards males; this might be something worth considering when inferring from this dataset.
+
+There are four different chest pain types (`ChestPainType`) - asymptomatic (ASY), atypical angina (ATA), non-anginal pain (NAP), and typical angina (TA).
+
+`RestingECG` is either LVH (showing probable or definite left ventricular hypertrophy by Estes' criteria), Normal, or ST (having ST-T wave abnormality - T wave inversions and/or ST elevation or depression of \> 0.05 mV).
+
+`ExerciseAngina` indicates whether or not the patient has exercise-induced angina.
+
+Finally, `ST_Slope` indicates the slope of the peak exercise ST segment (Up: upsloping, Flat: flat, Down: downsloping).
+
+Let's make a new, cleaned data frame where we convert all character features and the output feature to factors.
+
+```{r}
+finalData <- orig_data %>% mutate(HeartDisease=as.factor(HeartDisease)) %>% 
+	mutate(across(where(is.character), as.factor))
+```
+
+Now, let's take a look at the non-factor variables.
+
+(Note: figuring out how to loop through and graph numeric variables was a huge pain! Shout-out to ggplot for making visualization easier).
+
+To make these graphs, we first select the relevant variables, then work the data frame into two columns (this will help us separate by each variable). Then, we can make a plot with ggplot to visualize the distribution of our numeric variables.
+
+```{r}
+orig_data %>% select(where(is.double)) %>% pivot_longer(cols=everything()) %>% 
+	ggplot(aes(x=value, fill=name)) + 
+	facet_wrap(~ name, scales = 'free') + geom_histogram(bins=30)
+```
+
+It seems like `Age`, `maxHR`, and `RestingBP` are approximately normally distributed. `RestingBP` seemingly has an outlier at 0 (a dead person was counted in the data, probably). `Cholesterol` has a spike at 0, corresponding to missing data. We can probably leave `Oldpeak` as it is. Lastly, `FastingBS` is another binary data type, so we should convert it to factor so it is better represented in our data.
+
+```{r}
+finalData <- finalData %>% mutate(FastingBS=as.factor(FastingBS))
+
+finalData <- finalData %>% mutate(across(Cholesterol, function(i) {
+		if_else(i==0, as.numeric(NA), i)
+	}))
+```
+
+## Part Two: Random Forest Model
+
+### STEP ONE: CREATING THE MODEL FRAMEWORK
+
+Okay, now we have to split our original dataset into the training and testing subparts. Tidymodels provides a simple framework to do this with `initial_split()`. We also make a cross validation object which will come in handy later.
+
+```{r}
+set.seed(123456)
+dataSplit <- initial_split(finalData, prop = 3/4)
+dataTraining <- training(dataSplit)
+dataTesting <- testing(dataSplit)
+dataCV <- vfold_cv(dataTraining)
+dataCV
+```
+
+Okay, great. So we have two new datasets selected at random (`dataTraining` and `dataTesting`) and a cross-validation object. Now, we have to create the framework of the model. We'll do this with the `recipe()` function from tidymodels. Crucially, we specify the model to normalize all numeric columns (subtract the mean of each column and divide by its standard deviation) and impute the missing values in the `Cholesterol` column using the k-nearest neighbors method.
+
+```{r}
+dataRecipe <- recipe(HeartDisease ~ ., data=finalData) %>% 
+	step_normalize(all_numeric()) %>% step_impute_knn(Cholesterol)
+```
+
+So now we have our "recipe" to make the model; it's time to follow through. The `rand_forest()` function initializes a random forest model, then we set parameters with `set_args()`. We set `mtry` (the number of variables evaluated per tree) and `min_n` (the minimum number of observations needed in a node to split the node further - the lower the value, the deeper the tree) to `tune()` - this will allow us to iterate through these values on our cross validation datasets. The `importance` parameter says that we will define the importance of each variable by permutation (I will explain what this is later). Lastly, we tell the model that we want classification (0 or 1) instead of regression (continuous).
+
+```{r}
+rfModel <- rand_forest() %>% set_args(mtry=tune(), min_n=tune()) %>% 
+	set_engine('ranger', importance = 'permutation') %>% 
+	set_mode('classification')
+```
+
+We make a `workflow` object with our recipe and our model. Let's take a look at it:
+
+```{r}
+rfWorkflow <- workflow() %>% add_recipe(dataRecipe) %>% add_model(rfModel)
+rfWorkflow
+```
+
+### STEP TWO: TESTING DIFFERENT PARAMETERS
+
+The reason I tune()-d the `mtry` and `min_n` parameters is because these might significantly influence the accuracy and dependability of our model. Now that we have all the required frameworks, we can test parameter values.
+
+```{r}
+# Good mtry is sqrt(total vars) = sqrt(11) = 3
+rfGrid <- expand.grid(mtry=2:6, min_n=c(1, 3, 5, 10, 15, 20, 30))
+rfTuneResults <- rfWorkflow %>% tune_grid(resamples=dataCV, grid=rfGrid, 
+	metrics=metric_set(accuracy, roc_auc))
+rfTuneResults %>% collect_metrics()
+```
+
+I'm interested in the effect of `mtry`. Let's take a look across various `min_n`:
+
+```{r}
+rfTuneResults %>% collect_metrics() %>% filter(min_n %in% c(1,3,30), .metric=='accuracy')
+```
+
+Comparing `mtry`'s for each `min_n`, it seems like there is a small, weak negative correlation between `mtry` and model accuracy. However, `min_n` seems a lot more interesting. Let's keep experimenting. So, let's select the smallest `mtry` (2 and let's try 1 as well) and try a larger range of `min_n`.
+
+```{r}
+rfGrid2 <- expand.grid(mtry=1:2, min_n=c(1, 3, 5, seq(5, 50, 5)))
+rfTuneResults2 <- rfWorkflow %>% tune_grid(resamples=dataCV, grid=rfGrid2, 
+	metrics=metric_set(accuracy, roc_auc))
+rfTuneResults2 %>% collect_metrics() %>% filter(.metric=='accuracy') %>% 
+	arrange(desc(mean))
+rfTuneResults2 %>% collect_metrics() %>% filter(.metric=='roc_auc') %>% 
+	arrange(desc(mean))
+```
+
+mtry=2, min_n=5 comes in at first place for accuracy, first (tied) for roc_auc, and has lowest std error for accuracy and one of the lowest for roc_auc. It's safe to say that this model is our winner. Turns out we didn't need to investigate again after all!
+
+Now, let's select our winner model and apply it to our workflow.
+
+```{r}
+paramFinal <- rfTuneResults2 %>% select_best(metric='accuracy')
+rfWorkflow <- rfWorkflow %>% finalize_workflow(paramFinal)
+```
+
+### STEP THREE: FIT THE MODEL
+
+So now we have our workflow:
+
+```{r}
+rfWorkflow
+```
+
+Now we can fit this model onto our split data. Tidymodels is nice because it lets you automatically train on the training data and then evaluate on the testing data using the `initial_split()` object. Without further ado, let's fit it and see how it performs:
+
+```{r}
+rfFit <- rfWorkflow %>% last_fit(dataSplit)
+testPerformance <- rfFit %>% collect_metrics()
+testPerformance
+```
+
+Accuracy of 86.1%, not bad!
+
+Let's visualize our results. We'll make a confusion matrix:
+
+```{r}
+rfFit %>% collect_predictions() %>% conf_mat(truth=HeartDisease, 
+	estimate=.pred_class)
+```
+
+Our model on the testing data resulted in 81 true negatives, 117 true positive, 14 false negatives, and 18 false positives.
+
+```{r}
+rfFit %>% collect_predictions() %>% ggplot() + 
+	geom_density(aes(x=.pred_1, fill=HeartDisease, alpha=0.5))
+```
+
+We can see here that we have some pretty neat-looking separation. The plot colors positive outcomes in blue and negative in red. We can see that the model is pretty good at separating the positives from the negatives.
+
+### STEP FOUR: FIT ON A TARGET DATASET
+
+Now we can fit our final model on the dataset and analyze the importance of each variable.
+
+```{r}
+finalModel <- fit(rfWorkflow, finalData)
+extract_fit_parsnip(finalModel)$fit$variable.importance
+```
+
+Remember our "permutation" argument from before? To find variable `importance`, the model takes each variable one by one, shuffles its values (effectively removing its correlation to the outcome), and evaluates the decrease in the model metric (in this case, accuracy).
+
+To conclude, our model performed quite well with 86.1% accuracy, an area of 0.920 under the ROC curve, and a Brier score of 0.108. `ST_Slope` seems to be the most important variable, accounting for \~9% of the model's predictive power.
