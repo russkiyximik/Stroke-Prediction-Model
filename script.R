@@ -11,10 +11,10 @@ library(workflows)
 library(tune)
 library(ggplot2)
 library(ranger)
+library(RKaggle)
 
 
-unzip('archive.zip')
-orig_data <- read_csv('heart.csv')
+orig_data <- RKaggle::get_dataset('fedesoriano/heart-failure-prediction')
 
 
 
@@ -48,7 +48,7 @@ finalData <- finalData %>% mutate(across(Cholesterol, function(i) {
 
 # STEP THREE: CREATING THE MODEL FRAMEWORK
 # ----------------------------------------
-set.seed(12345)
+set.seed(123456)
 dataSplit <- initial_split(finalData, prop = 3/4)
 dataTraining <- training(dataSplit)
 dataTesting <- testing(dataSplit)
@@ -97,7 +97,7 @@ testPerformance
 rfFit %>% collect_predictions() %>% conf_mat(truth=HeartDisease, 
 	estimate=.pred_class)
 rfFit %>% collect_predictions() %>% ggplot() + 
-	geom_density(aes(x=.pred_0, fill=HeartDisease, alpha=0.5))
+	geom_density(aes(x=.pred_1, fill=HeartDisease, alpha=0.5))
 # Nice seperation!
 
 
