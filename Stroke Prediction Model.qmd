@@ -4,8 +4,6 @@ format: html
 editor: visual
 ---
 
-# Stroke Prediction Model
-
 ## Introduction
 
 I will be building several models to predict heart disease. I will be using the Heart Failure Prediction Dataset from \[Kaggle\] (https://www.kaggle.com/datasets/fedesoriano/heart-failure-prediction).
