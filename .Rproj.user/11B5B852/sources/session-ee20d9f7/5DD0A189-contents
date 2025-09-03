@@ -1,0 +1,9 @@
+project:
+  title: "Stroke Prediction Models"
+  type: website
+format:
+  html:
+    theme: cerulean
+
+
+
