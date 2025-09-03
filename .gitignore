@@ -4,6 +4,7 @@
 .Ruserdata
 .zip
 
+_site/
 *.html
 *.js
 
