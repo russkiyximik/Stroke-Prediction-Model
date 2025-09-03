@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.zip
+
+_site/
+*_files
+*.html
+*.js
+
+/.quarto/
+**/*.quarto_ipynb
