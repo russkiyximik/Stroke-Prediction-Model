@@ -1,0 +1,28 @@
+{
+    "id": "CAA72B7D",
+    "path": "C:/Users/polop/Documents/R/Stroke Prediction Model/script.R",
+    "project_path": "script.R",
+    "type": "r_source",
+    "hash": "3639990191",
+    "contents": "",
+    "dirty": true,
+    "created": 1756676233998.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "50,15",
+        "scrollLine": "37",
+        "ignored_words": "RShiny,mtry\n"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1756852436,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1756852436,
+    "read_only": false,
+    "read_only_alternatives": []
+}

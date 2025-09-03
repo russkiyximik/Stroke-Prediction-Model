@@ -1,0 +1,33 @@
+{
+    "id": "AEC2DECC",
+    "path": "C:/Users/polop/Documents/R/Stroke Prediction Model/Stroke Prediction Model.qmd",
+    "project_path": "Stroke Prediction Model.qmd",
+    "type": "quarto_markdown",
+    "hash": "196361163",
+    "contents": "",
+    "dirty": false,
+    "created": 1756824766799.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "rmdVisualMode": "false",
+        "rmdVisualWrapConfigured": "true",
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "4,3",
+        "scrollLine": "0",
+        "docOutlineVisible": "1",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "233:199.1999969482422",
+        "ignored_words": "anginal,Kaggle\n"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1756855401,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1756855401134,
+    "read_only": false,
+    "read_only_alternatives": []
+}
