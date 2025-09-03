@@ -5,6 +5,7 @@
 .zip
 
 _site/
+*_files
 *.html
 *.js
 
