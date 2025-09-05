@@ -149,66 +149,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="step-one-loading-libraries-and-data">STEP ONE: LOADING LIBRARIES AND DATA</h3>
 <p>This step is pretty self-explanatory. We will make use of six different R libraries for our initial analysis and model. First, <code>tidymodels</code> is a collection of packages for modeling and machine learning using <code>tidyverse</code> principles. The <code>workflows</code> library lets us use workflow container objects that are useful for modeling and analysis projects. The <code>tune</code> library will let us iterate through and find the best parameters for our models. The <code>ranger</code> library gives us access to a fast and efficient random forest algorithm. Lastly, <code>ggplot2</code> lets us make convenient and nice-looking plots.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.3.0 ──</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>✔ broom        1.0.9     ✔ recipes      1.3.1
-✔ dials        1.4.1     ✔ rsample      1.3.1
-✔ dplyr        1.1.4     ✔ tibble       3.3.0
-✔ ggplot2      3.5.2     ✔ tidyr        1.3.1
-✔ infer        1.0.9     ✔ tune         1.3.0
-✔ modeldata    1.5.1     ✔ workflows    1.3.0
-✔ parsnip      1.3.2     ✔ workflowsets 1.1.1
-✔ purrr        1.1.0     ✔ yardstick    1.3.2</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
-✖ purrr::discard() masks scales::discard()
-✖ dplyr::filter()  masks stats::filter()
-✖ dplyr::lag()     masks stats::lag()
-✖ recipes::step()  masks stats::step()</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ forcats   1.0.0     ✔ readr     2.1.5
-✔ lubridate 1.9.4     ✔ stringr   1.5.1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ readr::col_factor() masks scales::col_factor()
-✖ purrr::discard()    masks scales::discard()
-✖ dplyr::filter()     masks stats::filter()
-✖ stringr::fixed()    masks recipes::fixed()
-✖ dplyr::lag()        masks stats::lag()
-✖ readr::spec()       masks yardstick::spec()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(workflows)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tune)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>orig_data <span class="ot">&lt;-</span> RKaggle<span class="sc">::</span><span class="fu">get_dataset</span>(<span class="st">'fedesoriano/heart-failure-prediction'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 918 Columns: 12
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr (5): Sex, ChestPainType, RestingECG, ExerciseAngina, ST_Slope
-dbl (7): Age, RestingBP, Cholesterol, FastingBS, MaxHR, Oldpeak, HeartDisease
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(workflows)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tune)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>orig_data <span class="ot">&lt;-</span> RKaggle<span class="sc">::</span><span class="fu">get_dataset</span>(<span class="st">'fedesoriano/heart-failure-prediction'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="step-two-preliminary-eda-data-imputation" class="level3">
 <h3 class="anchored" data-anchor-id="step-two-preliminary-eda-data-imputation">STEP TWO: PRELIMINARY EDA, DATA IMPUTATION</h3>
 <p>Let’s take a glance at our data.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(orig_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(orig_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 918
 Columns: 12
@@ -229,7 +184,7 @@ $ HeartDisease   &lt;dbl&gt; 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 
 <p>So, our data has 12 columns. I’ll note that our output column (<code>HeartDisease</code>) is in 0s and 1s, representing negative and positive for heart disease, respectively. This is what we want to predict.</p>
 <p>We have two different column types, double and character. Let’s take a look at the character variables in the dataset.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>orig_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.character)) <span class="sc">%&gt;%</span> <span class="fu">apply</span>(<span class="dv">2</span>, table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>orig_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.character)) <span class="sc">%&gt;%</span> <span class="fu">apply</span>(<span class="dv">2</span>, table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$Sex
 
@@ -265,16 +220,16 @@ Down Flat   Up
 <p>Finally, <code>ST_Slope</code> indicates the slope of the peak exercise ST segment (Up: upsloping, Flat: flat, Down: downsloping).</p>
 <p>Let’s make a new, cleaned data frame where we convert all character features and the output feature to factors.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>finalData <span class="ot">&lt;-</span> orig_data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">HeartDisease=</span><span class="fu">as.factor</span>(HeartDisease)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.character), as.factor))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>finalData <span class="ot">&lt;-</span> orig_data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">HeartDisease=</span><span class="fu">as.factor</span>(HeartDisease)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.character), as.factor))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, let’s take a look at the non-factor variables.</p>
 <p>(Note: figuring out how to loop through and graph numeric variables was a huge pain! Shout-out to ggplot for making visualization easier).</p>
 <p>To make these graphs, we first select the relevant variables, then work the data frame into two columns (this will help us separate by each variable). Then, we can make a plot with ggplot to visualize the distribution of our numeric variables.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>orig_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.double)) <span class="sc">%&gt;%</span> <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>value, <span class="at">fill=</span>name)) <span class="sc">+</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> name, <span class="at">scales =</span> <span class="st">'free'</span>) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">bins=</span><span class="dv">30</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>orig_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.double)) <span class="sc">%&gt;%</span> <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>value, <span class="at">fill=</span>name)) <span class="sc">+</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> name, <span class="at">scales =</span> <span class="st">'free'</span>) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">bins=</span><span class="dv">30</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -285,12 +240,25 @@ Down Flat   Up
 </div>
 <p>It seems like <code>Age</code>, <code>maxHR</code>, and <code>RestingBP</code> are approximately normally distributed. <code>RestingBP</code> seemingly has an outlier at 0 (a dead person was counted in the data, probably). <code>Cholesterol</code> has a spike at 0, corresponding to missing data. We can probably leave <code>Oldpeak</code> as it is. Lastly, <code>FastingBS</code> is another binary data type, so we should convert it to factor so it is better represented in our data.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>finalData <span class="ot">&lt;-</span> finalData <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">FastingBS=</span><span class="fu">as.factor</span>(FastingBS))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>finalData <span class="ot">&lt;-</span> finalData <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="fu">across</span>(Cholesterol, <span class="cf">function</span>(i) {</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">if_else</span>(i<span class="sc">==</span><span class="dv">0</span>, <span class="fu">as.numeric</span>(<span class="cn">NA</span>), i)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    }))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>finalData <span class="ot">&lt;-</span> finalData <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">FastingBS=</span><span class="fu">as.factor</span>(FastingBS))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>finalData <span class="ot">&lt;-</span> finalData <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="fu">across</span>(Cholesterol, <span class="cf">function</span>(i) {</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">if_else</span>(i<span class="sc">==</span><span class="dv">0</span>, <span class="fu">as.numeric</span>(<span class="cn">NA</span>), i)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    }))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Lastly, let’s check if any our variables are correlated; if they are, they can increase redundancy and make the model more complex, therefore increasing the risk of overfitting.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>finalData <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span> cor</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Age  RestingBP Cholesterol      MaxHR    Oldpeak
+Age          1.0000000  0.2543994          NA -0.3820447  0.2586115
+RestingBP    0.2543994  1.0000000          NA -0.1121350  0.1648030
+Cholesterol         NA         NA           1         NA         NA
+MaxHR       -0.3820447 -0.1121350          NA  1.0000000 -0.1606906
+Oldpeak      0.2586115  0.1648030          NA -0.1606906  1.0000000</code></pre>
+</div>
+</div>
+<p>Thankfully, none of our features are highly correlated. The highest (absolute) correlation is between Age and Maximum Heart Rate, which makes sense. But we can ignore it.</p>
 </section>
 </section>
 <section id="part-two-random-forest-model" class="level2">
@@ -299,12 +267,12 @@ Down Flat   Up
 <h3 class="anchored" data-anchor-id="step-one-creating-the-model-framework">STEP ONE: CREATING THE MODEL FRAMEWORK</h3>
 <p>Okay, now we have to split our original dataset into the training and testing subparts. Tidymodels provides a simple framework to do this with <code>initial_split()</code>. We also make a cross validation object which will come in handy later.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>dataSplit <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(finalData, <span class="at">prop =</span> <span class="dv">3</span><span class="sc">/</span><span class="dv">4</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>dataTraining <span class="ot">&lt;-</span> <span class="fu">training</span>(dataSplit)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>dataTesting <span class="ot">&lt;-</span> <span class="fu">testing</span>(dataSplit)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>dataCV <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(dataTraining)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>dataCV</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dataSplit <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(finalData, <span class="at">prop =</span> <span class="dv">3</span><span class="sc">/</span><span class="dv">4</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>dataTraining <span class="ot">&lt;-</span> <span class="fu">training</span>(dataSplit)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>dataTesting <span class="ot">&lt;-</span> <span class="fu">testing</span>(dataSplit)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>dataCV <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(dataTraining)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>dataCV</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>#  10-fold cross-validation 
 # A tibble: 10 × 2
@@ -324,19 +292,19 @@ Down Flat   Up
 </div>
 <p>Okay, great. So we have two new datasets selected at random (<code>dataTraining</code> and <code>dataTesting</code>) and a cross-validation object. Now, we have to create the framework of the model. We’ll do this with the <code>recipe()</code> function from tidymodels. Crucially, we specify the model to normalize all numeric columns (subtract the mean of each column and divide by its standard deviation) and impute the missing values in the <code>Cholesterol</code> column using the k-nearest neighbors method.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dataRecipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(HeartDisease <span class="sc">~</span> ., <span class="at">data=</span>finalData) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_normalize</span>(<span class="fu">all_numeric</span>()) <span class="sc">%&gt;%</span> <span class="fu">step_impute_knn</span>(Cholesterol)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dataRecipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(HeartDisease <span class="sc">~</span> ., <span class="at">data=</span>finalData) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_normalize</span>(<span class="fu">all_numeric</span>()) <span class="sc">%&gt;%</span> <span class="fu">step_impute_knn</span>(Cholesterol)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>So now we have our “recipe” to make the model; it’s time to follow through. The <code>rand_forest()</code> function initializes a random forest model, then we set parameters with <code>set_args()</code>. We set <code>mtry</code> (the number of variables evaluated per tree) and <code>min_n</code> (the minimum number of observations needed in a node to split the node further - the lower the value, the deeper the tree) to <code>tune()</code> - this will allow us to iterate through these values on our cross validation datasets. The <code>importance</code> parameter says that we will define the importance of each variable by permutation (I will explain what this is later). Lastly, we tell the model that we want classification (0 or 1) instead of regression (continuous).</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>rfModel <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>() <span class="sc">%&gt;%</span> <span class="fu">set_args</span>(<span class="at">mtry=</span><span class="fu">tune</span>(), <span class="at">min_n=</span><span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">'ranger'</span>, <span class="at">importance =</span> <span class="st">'permutation'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_mode</span>(<span class="st">'classification'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>rfModel <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>() <span class="sc">%&gt;%</span> <span class="fu">set_args</span>(<span class="at">mtry=</span><span class="fu">tune</span>(), <span class="at">min_n=</span><span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">'ranger'</span>, <span class="at">importance =</span> <span class="st">'permutation'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_mode</span>(<span class="st">'classification'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We make a <code>workflow</code> object with our recipe and our model. Let’s take a look at it:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>rfWorkflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(dataRecipe) <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(rfModel)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>rfWorkflow</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rfWorkflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(dataRecipe) <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(rfModel)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>rfWorkflow</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
 Preprocessor: Recipe
@@ -366,11 +334,11 @@ Computational engine: ranger </code></pre>
 <h3 class="anchored" data-anchor-id="step-two-testing-different-parameters">STEP TWO: TESTING DIFFERENT PARAMETERS</h3>
 <p>The reason I tune()-d the <code>mtry</code> and <code>min_n</code> parameters is because these might significantly influence the accuracy and dependability of our model. Now that we have all the required frameworks, we can test parameter values.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Good mtry is sqrt(total vars) = sqrt(11) = 3</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>rfGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">mtry=</span><span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">min_n=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">30</span>))</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>rfTuneResults <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">tune_grid</span>(<span class="at">resamples=</span>dataCV, <span class="at">grid=</span>rfGrid, </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics=</span><span class="fu">metric_set</span>(accuracy, roc_auc))</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>rfTuneResults <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Good mtry is sqrt(total vars) = sqrt(11) = 3</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>rfGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">mtry=</span><span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">min_n=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">30</span>))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>rfTuneResults <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">tune_grid</span>(<span class="at">resamples=</span>dataCV, <span class="at">grid=</span>rfGrid, </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics=</span><span class="fu">metric_set</span>(accuracy, roc_auc))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>rfTuneResults <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 70 × 8
     mtry min_n .metric  .estimator  mean     n std_err .config              
@@ -390,7 +358,7 @@ Computational engine: ranger </code></pre>
 </div>
 <p>I’m interested in the effect of <code>mtry</code>. Let’s take a look across various <code>min_n</code>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>rfTuneResults <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(min_n <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">30</span>), .metric<span class="sc">==</span><span class="st">'accuracy'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>rfTuneResults <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(min_n <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">30</span>), .metric<span class="sc">==</span><span class="st">'accuracy'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 15 × 8
     mtry min_n .metric  .estimator  mean     n std_err .config              
@@ -414,14 +382,14 @@ Computational engine: ranger </code></pre>
 </div>
 <p>Comparing <code>mtry</code>’s for each <code>min_n</code>, it seems like there is a small, weak negative correlation between <code>mtry</code> and model accuracy. However, <code>min_n</code> seems a lot more interesting. Let’s keep experimenting. So, let’s select the smallest <code>mtry</code> (2 and let’s try 1 as well) and try a larger range of <code>min_n</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>rfGrid2 <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">mtry=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">min_n=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">50</span>, <span class="dv">5</span>)))</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>rfTuneResults2 <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">tune_grid</span>(<span class="at">resamples=</span>dataCV, <span class="at">grid=</span>rfGrid2, </span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics=</span><span class="fu">metric_set</span>(accuracy, roc_auc))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>rfGrid2 <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">mtry=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">min_n=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">50</span>, <span class="dv">5</span>)))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>rfTuneResults2 <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">tune_grid</span>(<span class="at">resamples=</span>dataCV, <span class="at">grid=</span>rfGrid2, </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics=</span><span class="fu">metric_set</span>(accuracy, roc_auc))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Duplicate rows in grid of tuning combinations found and removed.</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>rfTuneResults2 <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric<span class="sc">==</span><span class="st">'accuracy'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>rfTuneResults2 <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric<span class="sc">==</span><span class="st">'accuracy'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 24 × 8
     mtry min_n .metric  .estimator  mean     n std_err .config              
@@ -438,8 +406,8 @@ Computational engine: ranger </code></pre>
 10     1    10 accuracy binary     0.866    10  0.0135 Preprocessor1_Model07
 # ℹ 14 more rows</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>rfTuneResults2 <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric<span class="sc">==</span><span class="st">'roc_auc'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>rfTuneResults2 <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric<span class="sc">==</span><span class="st">'roc_auc'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 24 × 8
     mtry min_n .metric .estimator  mean     n std_err .config              
@@ -460,15 +428,15 @@ Computational engine: ranger </code></pre>
 <p>mtry=2, min_n=5 comes in at first place for accuracy, first (tied) for roc_auc, and has lowest std error for accuracy and one of the lowest for roc_auc. It’s safe to say that this model is our winner. Turns out we didn’t need to investigate again after all!</p>
 <p>Now, let’s select our winner model and apply it to our workflow.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>paramFinal <span class="ot">&lt;-</span> rfTuneResults2 <span class="sc">%&gt;%</span> <span class="fu">select_best</span>(<span class="at">metric=</span><span class="st">'accuracy'</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>rfWorkflow <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">finalize_workflow</span>(paramFinal)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>paramFinal <span class="ot">&lt;-</span> rfTuneResults2 <span class="sc">%&gt;%</span> <span class="fu">select_best</span>(<span class="at">metric=</span><span class="st">'accuracy'</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>rfWorkflow <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">finalize_workflow</span>(paramFinal)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="step-three-fit-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="step-three-fit-the-model">STEP THREE: FIT THE MODEL</h3>
 <p>So now we have our workflow:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>rfWorkflow</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>rfWorkflow</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
 Preprocessor: Recipe
@@ -495,9 +463,9 @@ Computational engine: ranger </code></pre>
 </div>
 <p>Now we can fit this model onto our split data. Tidymodels is nice because it lets you automatically train on the training data and then evaluate on the testing data using the <code>initial_split()</code> object. Without further ado, let’s fit it and see how it performs:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>rfFit <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">last_fit</span>(dataSplit)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>testPerformance <span class="ot">&lt;-</span> rfFit <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>()</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>testPerformance</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>rfFit <span class="ot">&lt;-</span> rfWorkflow <span class="sc">%&gt;%</span> <span class="fu">last_fit</span>(dataSplit)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>testPerformance <span class="ot">&lt;-</span> rfFit <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>testPerformance</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 4
   .metric     .estimator .estimate .config             
@@ -510,8 +478,8 @@ Computational engine: ranger </code></pre>
 <p>Accuracy of 86.1%, not bad!</p>
 <p>Let’s visualize our results. We’ll make a confusion matrix:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>rfFit <span class="sc">%&gt;%</span> <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span> <span class="fu">conf_mat</span>(<span class="at">truth=</span>HeartDisease, </span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate=</span>.pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>rfFit <span class="sc">%&gt;%</span> <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span> <span class="fu">conf_mat</span>(<span class="at">truth=</span>HeartDisease, </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate=</span>.pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          Truth
 Prediction   0   1
@@ -521,12 +489,12 @@ Prediction   0   1
 </div>
 <p>Our model on the testing data resulted in 81 true negatives, 117 true positive, 14 false negatives, and 18 false positives.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>rfFit <span class="sc">%&gt;%</span> <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x=</span>.pred_1, <span class="at">fill=</span>HeartDisease, <span class="at">alpha=</span><span class="fl">0.5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>rfFit <span class="sc">%&gt;%</span> <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x=</span>.pred_1, <span class="at">fill=</span>HeartDisease, <span class="at">alpha=</span><span class="fl">0.5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Stroke-Prediction-Model_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Stroke-Prediction-Model_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -537,8 +505,8 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="step-four-fit-on-a-target-dataset">STEP FOUR: FIT ON A TARGET DATASET</h3>
 <p>Now we can fit our final model on the dataset and analyze the importance of each variable.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>finalModel <span class="ot">&lt;-</span> <span class="fu">fit</span>(rfWorkflow, finalData)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_parsnip</span>(finalModel)<span class="sc">$</span>fit<span class="sc">$</span>variable.importance</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>finalModel <span class="ot">&lt;-</span> <span class="fu">fit</span>(rfWorkflow, finalData)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_parsnip</span>(finalModel)<span class="sc">$</span>fit<span class="sc">$</span>variable.importance</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>           Age            Sex  ChestPainType      RestingBP    Cholesterol 
   0.0079340368   0.0158278641   0.0334637354   0.0032045429   0.0009649963 
@@ -550,6 +518,104 @@ Prediction   0   1
 </div>
 <p>Remember our “permutation” argument from before? To find variable <code>importance</code>, the model takes each variable one by one, shuffles its values (effectively removing its correlation to the outcome), and evaluates the decrease in the model metric (in this case, accuracy).</p>
 <p>To conclude, our model performed quite well with 86.1% accuracy, an area of 0.920 under the ROC curve, and a Brier score of 0.108. <code>ST_Slope</code> seems to be the most important variable, accounting for ~9% of the model’s predictive power.</p>
+</section>
+</section>
+<section id="part-three-boosted-trees-model" class="level2">
+<h2 class="anchored" data-anchor-id="part-three-boosted-trees-model">Part Three: Boosted Trees Model</h2>
+<section id="step-one-creating-the-model-framework-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-one-creating-the-model-framework-1">STEP ONE: CREATING THE MODEL FRAMEWORK</h3>
+<p>Now let’s make a boosted tree model for our data. We will be using the <code>C5.0</code> algorithm, made convenient through R. Briefly, it sequentially creates trees in a forest, each one learning from the mistakes of the previous one. The first tree builds its nodes, finding the best split at each one using Gini impurity or entropy as in random forest. However, at the end of the tree, the observations are weighted - an increase in weight if misclassified, a decrease if correctly classified. The next tree puts more weight on classifying correctly the observations that were previously misclassified, new weights are calculated at the end of the tree, and the whole process is iterated until the forest finishes.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(C50)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>It is important to keep in mind that we can overfit our data by setting the amount of <code>trees</code> too high - our model will learn the noise, not the pattern. So, we will iterate through that as well as <code>min_n</code> as before.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>abModel <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>() <span class="sc">%&gt;%</span> <span class="fu">set_args</span>(<span class="at">trees=</span><span class="fu">tune</span>(), <span class="at">min_n=</span><span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">'C5.0'</span>) <span class="sc">%&gt;%</span> <span class="fu">set_mode</span>(<span class="st">'classification'</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>abWorkflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(dataRecipe) <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(abModel)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="step-two-testing-different-parameters-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-two-testing-different-parameters-1">STEP TWO: TESTING DIFFERENT PARAMETERS</h3>
+<p>We will expand the grid as before.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>abGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">trees=</span><span class="fu">seq</span>(<span class="dv">5</span>,<span class="dv">50</span>,<span class="dv">5</span>), </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">min_n=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="fu">seq</span>(<span class="dv">5</span>,<span class="dv">25</span>,<span class="dv">10</span>)))</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>abTuneResults <span class="ot">&lt;-</span> abWorkflow <span class="sc">%&gt;%</span> <span class="fu">tune_grid</span>(<span class="at">resamples=</span>dataCV, <span class="at">grid=</span>abGrid, </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">metrics=</span><span class="fu">metric_set</span>(accuracy, roc_auc))</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>abTuneResults <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric<span class="sc">==</span><span class="st">'accuracy'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(mean)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(trees, min_n, mean) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">c</span>(trees, min_n)) <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>value,<span class="at">y=</span>mean)) <span class="sc">+</span> </span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>name,<span class="at">scales=</span><span class="st">'free'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Stroke-Prediction-Model_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>It seems like there might be a positive correlation between min_n and accuracy. It’s worth investigating this further.</p>
+<p>Note: This .qmd file is already computationally expensive so I just won’t run this chunk to save processing time. I pasted the output, though.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>abGrid2 <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">trees=</span><span class="dv">50</span>, <span class="at">min_n=</span><span class="fu">seq</span>(<span class="dv">25</span>,<span class="dv">100</span>,<span class="dv">5</span>))</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>abTuneResults2 <span class="ot">&lt;-</span> abWorkflow <span class="sc">%&gt;%</span> <span class="fu">tune_grid</span>(<span class="at">resamples=</span>dataCV, <span class="at">grid=</span>abGrid2, </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">metrics=</span><span class="fu">metric_set</span>(accuracy, roc_auc))</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>abTuneResults2 <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric<span class="sc">==</span><span class="st">'accuracy'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(mean)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(trees, min_n, mean) <span class="sc">%&gt;%</span> </span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">c</span>(trees, min_n)) <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>value,<span class="at">y=</span>mean)) <span class="sc">+</span> </span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>name,<span class="at">scales=</span><span class="st">'free'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="c50test.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>Graph of min_n</figcaption>
+</figure>
+</div>
+<p>Interestingly, it seems like the accuracy falls. Oh well, it didn’t hurt to investigate. Let’s finalize our workflow again:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>paramFinal <span class="ot">&lt;-</span> abTuneResults <span class="sc">%&gt;%</span> <span class="fu">select_best</span>(<span class="at">metric=</span><span class="st">'accuracy'</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>abWorkflow <span class="ot">&lt;-</span> abWorkflow <span class="sc">%&gt;%</span> <span class="fu">finalize_workflow</span>(paramFinal)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="step-three-fit-the-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-three-fit-the-model-1">STEP THREE: FIT THE MODEL</h3>
+<p>Let’s fit our model like we did with RF:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>abFit <span class="ot">&lt;-</span> abWorkflow <span class="sc">%&gt;%</span> <span class="fu">last_fit</span>(dataSplit)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>testPerformance <span class="ot">&lt;-</span> abFit <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>()</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>testPerformance</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+  .metric     .estimator .estimate .config             
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy    binary         0.861 Preprocessor1_Model1
+2 roc_auc     binary         0.914 Preprocessor1_Model1
+3 brier_class binary         0.112 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>Our model has 86.1% accuracy, coincidentally the same as RF from before!</p>
+<p>Let’s make a confusion matrix and plot how our model separates values as before:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>abFit <span class="sc">%&gt;%</span> <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span> <span class="fu">conf_mat</span>(<span class="at">truth=</span>HeartDisease, </span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">estimate=</span>.pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          Truth
+Prediction   0   1
+         0  80  13
+         1  19 118</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>abFit <span class="sc">%&gt;%</span> <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x=</span>.pred_1, <span class="at">fill=</span>HeartDisease, <span class="at">alpha=</span><span class="fl">0.5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Stroke-Prediction-Model_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In conclusion, we got VERY similar results to our RF model. The accuracy was the same to the tenths place. Onwards to the next model!</p>
 
 
 </section>
@@ -628,7 +694,7 @@ Prediction   0   1
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/russkiyximik\.github\.io\/Stroke-Prediction-Model\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
