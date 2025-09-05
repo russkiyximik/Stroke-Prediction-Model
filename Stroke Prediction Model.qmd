@@ -20,7 +20,7 @@ Part one is common to all the models. It's quite brief and simply goes through t
 
 This step is pretty self-explanatory. We will make use of six different R libraries for our initial analysis and model. First, `tidymodels` is a collection of packages for modeling and machine learning using `tidyverse` principles. The `workflows` library lets us use workflow container objects that are useful for modeling and analysis projects. The `tune` library will let us iterate through and find the best parameters for our models. The `ranger` library gives us access to a fast and efficient random forest algorithm. Lastly, `ggplot2` lets us make convenient and nice-looking plots.
 
-```{r results='hide'}
+```{r, message=FALSE}
 library(tidymodels)
 library(tidyverse)
 library(workflows)
@@ -87,6 +87,14 @@ finalData <- finalData %>% mutate(across(Cholesterol, function(i) {
 		if_else(i==0, as.numeric(NA), i)
 	}))
 ```
+
+Lastly, let's check if any our variables are correlated; if they are, they can increase redundancy and make the model more complex, therefore increasing the risk of overfitting.
+
+```{r}
+finalData %>% select(where(is.numeric)) %>% cor
+```
+
+Thankfully, none of our features are highly correlated. The highest (absolute) correlation is between Age and Maximum Heart Rate, which makes sense. But we can ignore it.
 
 ## Part Two: Random Forest Model
 
@@ -210,3 +218,86 @@ extract_fit_parsnip(finalModel)$fit$variable.importance
 Remember our "permutation" argument from before? To find variable `importance`, the model takes each variable one by one, shuffles its values (effectively removing its correlation to the outcome), and evaluates the decrease in the model metric (in this case, accuracy).
 
 To conclude, our model performed quite well with 86.1% accuracy, an area of 0.920 under the ROC curve, and a Brier score of 0.108. `ST_Slope` seems to be the most important variable, accounting for \~9% of the model's predictive power.
+
+## Part Three: Boosted Trees Model
+
+### STEP ONE: CREATING THE MODEL FRAMEWORK
+
+Now let's make a boosted tree model for our data. We will be using the `C5.0` algorithm, made convenient through R. Briefly, it sequentially creates trees in a forest, each one learning from the mistakes of the previous one. The first tree builds its nodes, finding the best split at each one using Gini impurity or entropy as in random forest. However, at the end of the tree, the observations are weighted - an increase in weight if misclassified, a decrease if correctly classified. The next tree puts more weight on classifying correctly the observations that were previously misclassified, new weights are calculated at the end of the tree, and the whole process is iterated until the forest finishes.
+
+```{r, message=FALSE}
+library(C50)
+```
+
+It is important to keep in mind that we can overfit our data by setting the amount of `trees` too high - our model will learn the noise, not the pattern. So, we will iterate through that as well as `min_n` as before.
+
+```{r}
+abModel <- boost_tree() %>% set_args(trees=tune(), min_n=tune()) %>% 
+	set_engine('C5.0') %>% set_mode('classification')
+abWorkflow <- workflow() %>% add_recipe(dataRecipe) %>% add_model(abModel)
+```
+
+### STEP TWO: TESTING DIFFERENT PARAMETERS
+
+We will expand the grid as before.
+
+```{r}
+#| warning: false
+abGrid <- expand.grid(trees=seq(5,50,5), 
+		      min_n=c(2,seq(5,25,10)))
+abTuneResults <- abWorkflow %>% tune_grid(resamples=dataCV, grid=abGrid, 
+					  metrics=metric_set(accuracy, roc_auc))
+abTuneResults %>% collect_metrics() %>% filter(.metric=='accuracy') %>% 
+	arrange(desc(mean)) %>% select(trees, min_n, mean) %>% 
+	pivot_longer(cols=c(trees, min_n)) %>% ggplot(aes(x=value,y=mean)) + 
+	geom_point() + facet_wrap(~name,scales='free')
+```
+
+It seems like there might be a positive correlation between min_n and accuracy. It's worth investigating this further.
+
+Note: This .qmd file is already computationally expensive so I just won't run this chunk to save processing time. I pasted the output, though.
+
+```{r}
+#| eval: false
+abGrid2 <- expand.grid(trees=50, min_n=seq(25,100,5))
+abTuneResults2 <- abWorkflow %>% tune_grid(resamples=dataCV, grid=abGrid2, 
+					  metrics=metric_set(accuracy, roc_auc))
+abTuneResults2 %>% collect_metrics() %>% filter(.metric=='accuracy') %>% 
+	arrange(desc(mean)) %>% select(trees, min_n, mean) %>% 
+	pivot_longer(cols=c(trees, min_n)) %>% ggplot(aes(x=value,y=mean)) + 
+	geom_point() + facet_wrap(~name,scales='free')
+```
+
+
+![Graph of min_n](c50test.png){width=50%}
+
+Interestingly, it seems like the accuracy falls. Oh well, it didn't hurt to investigate. Let's finalize our workflow again:
+
+```{r}
+paramFinal <- abTuneResults %>% select_best(metric='accuracy')
+abWorkflow <- abWorkflow %>% finalize_workflow(paramFinal)
+```
+
+### STEP THREE: FIT THE MODEL
+
+Let's fit our model like we did with RF:
+
+```{r}
+abFit <- abWorkflow %>% last_fit(dataSplit)
+testPerformance <- abFit %>% collect_metrics()
+testPerformance
+```
+
+Our model has 86.1% accuracy, coincidentally the same as RF from before!
+
+Let's make a confusion matrix and plot how our model separates values as before:
+
+```{r}
+abFit %>% collect_predictions() %>% conf_mat(truth=HeartDisease, 
+					     estimate=.pred_class)
+abFit %>% collect_predictions() %>% ggplot() + 
+	geom_density(aes(x=.pred_1, fill=HeartDisease, alpha=0.5))
+
+```
+
+In conclusion, we got VERY similar results to our RF model. The accuracy was the same to the tenths place. Onwards to the next model!
