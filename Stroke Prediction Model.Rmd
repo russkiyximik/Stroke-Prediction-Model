@@ -1,24 +1,23 @@
 ---
 title: "Stroke Prediction Model"
-format: html
-editor: visual
+author: "Alexander Ponomarev"
+date: "2025-08-23"
+output: html_document
 ---
 
 ## Introduction
 
-I will be building several models to predict heart disease. I will be using the Heart Failure Prediction Dataset from \[Kaggle\] (https://www.kaggle.com/datasets/fedesoriano/heart-failure-prediction).
+In this RPubs article, I will be building and evaluating several ML classification models using data from the [Heart Failure Prediction Dataset](https://www.kaggle.com/datasets/fedesoriano/heart-failure-prediction) available on Kaggle.
 
-This web page will be split into several chunks. The first will be for data description and preparation, and the next several will be for each model that I subsequently add.
+This page will be split into several sections. The first will cover data description and preparation, and the following will be for each model.
 
-I will first use a random forest model, then will update with more models periodically.
+I start with a random forest model and will update with more models periodically.
 
 ## Part One: Data Description, Processing, and Preparation
 
-Part one is common to all the models. It's quite brief and simply goes through the pre-processing and data cleaning.
-
 ### STEP ONE: LOADING LIBRARIES AND DATA
 
-This step is pretty self-explanatory. We will make use of six different R libraries for our initial analysis and model. First, `tidymodels` is a collection of packages for modeling and machine learning using `tidyverse` principles. The `workflows` library lets us use workflow container objects that are useful for modeling and analysis projects. The `tune` library will let us iterate through and find the best parameters for our models. The `ranger` library gives us access to a fast and efficient random forest algorithm. Lastly, `ggplot2` lets us make convenient and nice-looking plots.
+We will make use of six different R libraries for our initial analysis and data modeling. First, `tidymodels` is a collection of packages for modeling and machine learning using `tidyverse` principles. The `workflows` library lets us use workflow container objects that are useful for modeling and analysis projects. The `tune` library will let us iterate through and find the best parameters for our models. The `ranger` library gives us access to a fast and efficient random forest algorithm. Lastly, `ggplot2` lets us make convenient and nice-looking plots.
 
 ```{r, message=FALSE}
 library(tidymodels)
@@ -39,7 +38,7 @@ Let's take a glance at our data.
 glimpse(orig_data)
 ```
 
-So, our data has 12 columns. I'll note that our output column (`HeartDisease`) is in 0s and 1s, representing negative and positive for heart disease, respectively. This is what we want to predict.
+So, our data has 12 columns. Note that our output column (`HeartDisease`) is in 0s and 1s, representing negative and positive for heart disease, respectively. This is what we want to predict.
 
 We have two different column types, double and character. Let's take a look at the character variables in the dataset.
 
@@ -94,7 +93,7 @@ Lastly, let's check if any our variables are correlated; if they are, they can i
 finalData %>% select(where(is.numeric)) %>% cor
 ```
 
-Thankfully, none of our features are highly correlated. The highest (absolute) correlation is between Age and Maximum Heart Rate, which makes sense. But we can ignore it.
+Thankfully, none of our features are highly correlated. The highest (absolute) correlation is between Age and Maximum Heart Rate, which makes sense. But we can ignore it for now.
 
 ## Part Two: Random Forest Model
 
@@ -103,7 +102,7 @@ Thankfully, none of our features are highly correlated. The highest (absolute) c
 Okay, now we have to split our original dataset into the training and testing subparts. Tidymodels provides a simple framework to do this with `initial_split()`. We also make a cross validation object which will come in handy later.
 
 ```{r}
-set.seed(123456)
+set.seed(12345)
 dataSplit <- initial_split(finalData, prop = 3/4)
 dataTraining <- training(dataSplit)
 dataTesting <- testing(dataSplit)
@@ -163,9 +162,9 @@ rfTuneResults2 %>% collect_metrics() %>% filter(.metric=='roc_auc') %>%
 	arrange(desc(mean))
 ```
 
-mtry=2, min_n=5 comes in at first place for accuracy, first (tied) for roc_auc, and has lowest std error for accuracy and one of the lowest for roc_auc. It's safe to say that this model is our winner. Turns out we didn't need to investigate again after all!
+mtry=2, min_n=20 comes in at first place for accuracy, first (tied) for roc_auc, and has low standard errors. It's safe to say that this model is our winner.
 
-Now, let's select our winner model and apply it to our workflow.
+Now, let's apply it to our workflow.
 
 ```{r}
 paramFinal <- rfTuneResults2 %>% select_best(metric='accuracy')
@@ -188,7 +187,7 @@ testPerformance <- rfFit %>% collect_metrics()
 testPerformance
 ```
 
-Accuracy of 86.1%, not bad!
+Accuracy of 84.3%, not bad!
 
 Let's visualize our results. We'll make a confusion matrix:
 
@@ -197,14 +196,14 @@ rfFit %>% collect_predictions() %>% conf_mat(truth=HeartDisease,
 	estimate=.pred_class)
 ```
 
-Our model on the testing data resulted in 81 true negatives, 117 true positive, 14 false negatives, and 18 false positives.
+Our model on the testing data resulted in 81 true negatives, 113 true positive, 15 false negatives, and 21 false positives.
 
 ```{r}
 rfFit %>% collect_predictions() %>% ggplot() + 
 	geom_density(aes(x=.pred_1, fill=HeartDisease, alpha=0.5))
 ```
 
-We can see here that we have some pretty neat-looking separation. The plot colors positive outcomes in blue and negative in red. We can see that the model is pretty good at separating the positives from the negatives.
+We can see here that we have some neat-looking separation. The plot colors positive outcomes in blue and negative in red. We can see that the model is pretty good at separating the positives from the negatives.
 
 ### STEP FOUR: FIT ON A TARGET DATASET
 
@@ -217,7 +216,7 @@ extract_fit_parsnip(finalModel)$fit$variable.importance
 
 Remember our "permutation" argument from before? To find variable `importance`, the model takes each variable one by one, shuffles its values (effectively removing its correlation to the outcome), and evaluates the decrease in the model metric (in this case, accuracy).
 
-To conclude, our model performed quite well with 86.1% accuracy, an area of 0.920 under the ROC curve, and a Brier score of 0.108. `ST_Slope` seems to be the most important variable, accounting for \~9% of the model's predictive power.
+To conclude, our model performed quite well with 84.3% accuracy, an area of 0.921 under the ROC curve, and a Brier score of 0.112. `ST_Slope` seems to be the most important variable, accounting for \~9% of the model's predictive power.
 
 ## Part Three: Boosted Trees Model
 
@@ -255,7 +254,7 @@ abTuneResults %>% collect_metrics() %>% filter(.metric=='accuracy') %>%
 
 It seems like there might be a positive correlation between min_n and accuracy. It's worth investigating this further.
 
-Note: This .qmd file is already computationally expensive so I just won't run this chunk to save processing time. I pasted the output, though.
+<!--Note: This .qmd file is already computationally expensive so I just won't run this chunk to save processing time. I pasted the output, though.-->
 
 ```{r}
 #| eval: false
@@ -287,9 +286,9 @@ testPerformance <- abFit %>% collect_metrics()
 testPerformance
 ```
 
-Our model has 86.1% accuracy, coincidentally the same as RF from before!
+Our model has 86.1% accuracy, slightly better than RF.
 
-Let's make a confusion matrix and plot how our model separates values as before:
+Let's make a confusion matrix and plot how our model separates values:
 
 ```{r}
 abFit %>% collect_predictions() %>% conf_mat(truth=HeartDisease, 
@@ -299,4 +298,6 @@ abFit %>% collect_predictions() %>% ggplot() +
 
 ```
 
-In conclusion, we got VERY similar results to our RF model. The accuracy was the same to the tenths place. Onwards to the next model!
+In conclusion, this model performed similarly relative to random forest – it is a bit more accurate and has near-equivalent ROC AUC and Brier score metrics.
+
+New model coming soon!
